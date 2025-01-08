@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-pod-deploy
+  namespace: playground
+  labels:
+    app: test-pod
+    purpose: playground
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: playground-pod
+  template:
+    metadata: 
+      labels: 
+        app: playground-pod
+    spec:
+      containers:
+      - name: play-pod
+        image: tori209/test-image:0.1
+        # imagePullPolicy: Never
+        resources: {}
+        command: ["/bin/bash", "-c", "while true; do sleep 1000; done"]
+        ports:
+        - containerPort: 80
+      nodeName: s6

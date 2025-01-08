@@ -1,0 +1,59 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: monitor-gateway
+  namespace: cilium-monitoring
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - protocol: HTTP
+    port: 9090
+    name: prometheus-port
+    allowedRoutes:
+      namespaces:
+        from: Same
+  - protocol: HTTP
+    port: 3000
+    name: grafana-port
+    allowedRoutes:
+      namespaces:
+        from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: prometheus-httproute
+  namespace: cilium-monitoring
+spec:
+  parentRefs:
+  - name: monitor-gateway
+    namespace: cilium-monitoring
+    sectionName: prometheus-port
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: prometheus
+      port: 9090
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: grafana-httproute
+  namespace: cilium-monitoring
+spec:
+  parentRefs:
+  - name: monitor-gateway
+    namespace: cilium-monitoring
+    sectionName: grafana-port
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: grafana
+      port: 3000
+

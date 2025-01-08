@@ -1,0 +1,30 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: socket-track
+  namespace: default
+spec:
+  kprobes:
+    - call: "sk_alloc"
+      syscall: false
+      selectors:
+        - matchNamespace: default
+      return: true
+      args:
+      - index: 1
+        type: int
+        label: "family"
+      returnArg:
+        type: sock
+      returnArgAction: TrackSock
+    - call: "__sk_free"
+      syscall: false
+      args:
+        - index: 0
+          type: sock
+      selectors:
+        - matchNamespace: default
+        - matchActions:
+          - action: UntrackSock
+            argSock: 0
+

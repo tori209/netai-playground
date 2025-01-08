@@ -1,0 +1,43 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: "tracing-fd"
+  namespace: playground
+spec:
+  kprobes:
+  - call: "fd_install"
+    syscall: false
+    args:
+    - index: 0
+      type: "int"
+    - index: 1
+      type: "file"
+    selectors:
+    - matchPIDs:
+      - operator: NotIn
+        isNamespacePID: true
+        values:
+        - 0
+        - 1
+      matchActions:
+      - action: FollowFD
+        argFd: 0
+        argName: 1
+      - action: NoPost
+  - call: "sys_close"
+    syscall: true
+    args:
+    - index: 0
+      type: "int"
+    selectors:
+    - matchPIDs:
+      - operator: NotIn
+        isNamespacePID: true
+        values:
+        - 0
+        - 1
+      matchActions:
+      - action: UnfollowFD
+        argFd: 0
+        argName: 0
+      - action: NoPost

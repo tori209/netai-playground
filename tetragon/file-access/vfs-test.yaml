@@ -1,0 +1,34 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: "tracing-vfs"
+  namespace: playground
+spec:
+  kprobes:
+  - call: "vfs_read"
+    syscall: false
+    args:
+    - index: 0
+      type: "file"
+    - index: 1
+      type: "char_buf"
+        #returnCopy: true
+      maxData: true
+      sizeArgIndex: 3
+    - index: 2
+      type: "size_t"
+    #- index: 3
+    #  type: "int64"
+    selectors:
+    - matchArgs:
+      - index: 0
+        operator: "Prefix"
+        values:
+        - "/home"
+      - index: 1
+        operator: "Mask"
+        values:
+        - "1"
+      matchReturnActions:
+      - action: Sigkill 
+

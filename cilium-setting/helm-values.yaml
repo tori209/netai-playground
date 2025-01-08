@@ -1,0 +1,71 @@
+# For Kube-proxy Free Setting.
+kubeProxyReplacement: true
+k8sServiceHost: "192.168.20.11"
+k8sServicePort: 6443
+
+# Cilium As Ingress Controller Setting
+#ingressController:
+#  enabled: true
+#  default: true # Set Cilium as Default Ingress Controller
+#
+#  # Create Shared Controller
+#  #loadbalancerMode: "shared"
+#  #sharedListenerPort: 8080  # Default=8080
+#  
+#  # Create Controller Per Ingress
+#  loadbalancerMode: "dedicated"
+#  service:
+#    type: 
+#  # UNCOMMENT THIS WHEN "hostNetwork.enabled=true"
+#  #service:
+#  #  type: ClusterIP
+#  #  externalTrafficPolicy: null
+#
+#  
+#  # If hostNetwork.enabled == true, Service Type NodePort/Loadbalancer will be disabled.
+#  hostNetwork:
+#    enabled: true
+#  l7Proxy: true
+
+# Cilium Gateway API Setting
+gatewayAPI:
+  enabled: true
+  hostNetwork:
+    enabled: true
+l7Proxy: true
+nodePort:
+  enabled: true
+k8sServiceHost: "auto"
+k8sServicePort: "auto"
+endpointRoutes:
+  enabled: true
+
+# Hubble Setting
+hubble:
+  enabled: true 
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+  # REF: https://docs.cilium.io/en/latest/observability/hubble/configuration/export/
+  export:
+    static:
+      enabled: true # Set true to enable static log exporter
+      filePath: "/var/run/cilium/hubble/events.log"
+    dynamic:
+      enabled: false # For Safety
+    fileMaxSizeMb: 10 # Default = 10
+    fileMaxBackups: 5 # Default = 5
+  # https://docs.cilium.io/en/stable/observability/grafana/
+  metrics:
+    enableOpenMetrics: true
+    enabled: [dns,drop,tcp,flow,port-distribution,icmp,"httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction"]
+    
+# Prometheus
+prometheus:
+  enabled: true
+operator:
+  prometheus:
+    enabled: true
+
+
