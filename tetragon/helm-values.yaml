@@ -1,0 +1,8 @@
+tetragon:
+  prometheus:
+    serviceMonitor:
+      enabled: true
+tetragonOperator:
+  probetheus:
+    serviceMonitor:
+      enabled: true

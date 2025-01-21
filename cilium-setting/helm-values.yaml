@@ -48,19 +48,33 @@ hubble:
   ui:
     enabled: true
   # REF: https://docs.cilium.io/en/latest/observability/hubble/configuration/export/
-  export:
-    static:
-      enabled: true # Set true to enable static log exporter
-      filePath: "/var/run/cilium/hubble/events.log"
-    dynamic:
-      enabled: false # For Safety
-    fileMaxSizeMb: 10 # Default = 10
-    fileMaxBackups: 5 # Default = 5
+  #  export:
+  #    static:
+  #      enabled: true # Set true to enable static log exporter
+  #      filePath: "/var/run/cilium/hubble/events.log"
+  #    dynamic:
+  #      enabled: false # For Safety
+  #    fileMaxSizeMb: 10 # Default = 10
+  #    fileMaxBackups: 5 # Default = 5
   # https://docs.cilium.io/en/stable/observability/grafana/
   metrics:
     enableOpenMetrics: true
-    enabled: [dns,drop,tcp,flow,port-distribution,icmp,"httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction"]
-    
+      #    serviceMonitor:
+      #      enabled: true
+      #    dashboards:
+      #      enabled: true
+      #      namespace: monitoring
+      #      annotations:
+      #        grafana_folder: "Hubble"
+    enabled: 
+    - dns:query;ignoreAAAA
+    - drop #:sourceContext=identity;destinationContext=identity
+    - tcp
+    - flow
+    - port-distribution
+    - icmp
+    # Enable additional labels for L7 flows
+    - httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction
 # Prometheus
 prometheus:
   enabled: true

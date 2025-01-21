@@ -1,0 +1,15 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: "file-removal"
+  namespace: "playground"
+spec:
+  kprobes:
+  - call: "do_unlinkat"
+    message: "file removal checker test"
+    syscall: true
+    args:
+    - index: 0
+      type: "int" 
+    - index: 1
+      type: "filename" 

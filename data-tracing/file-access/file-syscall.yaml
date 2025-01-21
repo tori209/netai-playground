@@ -1,0 +1,53 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: "file-open"
+  namespace: "playground"
+  labels:
+    tracing-method: syscall
+spec:
+  kprobes:
+  - call: "sys_open"
+    syscall: true
+    args:
+    - index: 0
+      type: filename
+    - index: 1
+      type: int
+    - index: 2
+      type: uint16
+    selectors:
+      matchReturnActions:
+      - action: FollowFD
+        argName: 0
+  - call: "sys_openat"
+    syscall: true
+    args:
+    - index: 0
+      type: int
+      label: dfd 
+    - index: 1
+      type: string
+      label: filename
+    - index: 2
+      type: int
+      label: flags
+    - index: 3
+      type: uint16
+      label: mode
+---
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: "file-close"
+  namespace: "playground"
+  labels:
+    tracing-method: syscall
+spec:
+  kprobes:
+  - call: "sys_close"
+    syscall: true
+    args:
+    - index: 0
+      type: int
+    selectors: 

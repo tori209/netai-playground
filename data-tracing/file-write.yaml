@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: "file-write"
+  namespace: "playground"
+spec:
+  kprobes:
+  - call: "vfs_write"
+    message: "File Write Event"
+    syscall: false
+    args:
+    - index: 0
+      type: "file" # (struct file *) used for getting the path
+    - index: 1
+      type: "char_buf"
+    - index: 2
+      type: "size_t"
+    tags: [ "observability.filesystem", "observability.process" ]
