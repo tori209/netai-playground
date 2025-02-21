@@ -1,0 +1,43 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: socket-create
+  namespace: playground
+  labels:
+    tracing-method: kprobe
+spec:
+  kprobes:
+  - call: "sk_alloc"
+    syscall: false
+    return: true
+    args:
+    - index: 1
+      type: int
+      label: family
+    returnArg:
+      index: 0
+      type: sock
+    returnArgAction: TrackSock
+    selectors: 
+    - matchActions:
+      - action: NoPost
+---
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: socket-free
+  namespace: playground
+  labels:
+    tracing-method: kprobe
+spec:
+  kprobes:
+  - call: "__sk_free"
+    syscall: false
+    args:
+    - index: 0
+      type: sock
+    selectors:
+    - matchActions:
+      - action: NoPost
+      - action: UntrackSock
+        argSock: 0

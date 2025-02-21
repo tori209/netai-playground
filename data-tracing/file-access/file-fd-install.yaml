@@ -17,17 +17,23 @@ spec:
     selectors:
     - matchPIDs:
       - operator: NotIn
-        followForks: true
+        # followForks: true
         isNamespacePID: true
         values:
         - 0
         - 1
+      matchArgs:
+      - index: 1
+        operator: "Prefix"
+        values:
+        - "/nfs-vol"
       matchActions:
       - action: FollowFD
         argFd: 0
         argName: 1
 ---
 apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
 kind: TracingPolicyNamespaced
 metadata:
   name: "file-close"
@@ -42,7 +48,7 @@ spec:
     selectors:
     - matchPIDs:
       - operator: NotIn
-        followForks: true
+       # followForks: true
         isNamespacePID: true
         values:
         - 0

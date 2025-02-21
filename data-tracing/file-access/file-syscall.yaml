@@ -51,3 +51,13 @@ spec:
     - index: 0
       type: int
     selectors: 
+    - matchPIDs:
+      - operator: NotIn
+        followForks: true
+        isNamespacePID: true
+        values:
+        - 0
+        - 1
+      matchActions:
+      - action: UnfollowFD
+        argFd: 0

@@ -3,6 +3,10 @@ tetragon:
     serviceMonitor:
       enabled: true
 tetragonOperator:
-  probetheus:
+  prometheus:
     serviceMonitor:
       enabled: true
+rthooks:
+  enabled: true
+  interface: nri-hook
+  failAllowNamespaces: "default,playground"

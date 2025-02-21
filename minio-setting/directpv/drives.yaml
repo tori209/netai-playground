@@ -1,0 +1,34 @@
+version: v1
+nodes:
+    - name: s6
+      drives:
+        - id: 8:3$4U8Pcf/FNM0qb9XWRqhyJHhEre71HGu7R32/3nw0La0=
+          name: sda3
+          size: 4294967296
+          make: ATA INTEL_SSDSC2BB48 (Part 3)
+          fs: swap
+          select: "yes"
+    - name: s3
+      drives:
+        - id: 8:3$jgKBtzymCORQFS4pYiDdiLv7na1gbbFBml+OOtXsZLY=
+          name: sda3
+          size: 4294967296
+          make: ATA INTEL_SSDSC2BB48 (Part 3)
+          fs: swap
+          select: "yes"
+    - name: s4
+      drives:
+        - id: 8:3$tdpVfgDT5c8kVuv/A8qVeIZW+2GiS+BI+MqYd/7qlgk=
+          name: sda3
+          size: 4294967296
+          make: ATA INTEL_SSDSC2BB48 (Part 3)
+          fs: swap
+          select: "yes"
+    - name: s5
+      drives:
+        - id: 8:3$2PwqW8/v295xGNvp9qBYdUr+2NlzBAGahmLDSEOp+Jo=
+          name: sda3
+          size: 4294967296
+          make: ATA INTEL_SSDSC2BB48 (Part 3)
+          fs: swap
+          select: "yes"

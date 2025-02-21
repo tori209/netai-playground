@@ -1,0 +1,26 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: "socket-send"
+  namespace: playground
+spec:
+  kprobes:
+  - call: "sock_sendmsg"
+    syscall: false
+    args:
+    - index: 0
+      type: sock
+#  - call: "tcp_sendmsg"
+#    syscall: false
+#    args:
+#    - index: 0
+#      type: sock
+#    - index: 2
+#      type: uint32
+#  - call: "udp_sendmsg"
+#    syscall: false
+#    args:
+#    - index: 0
+#      type: sock
+#    - index: 2
+#      type: uint32

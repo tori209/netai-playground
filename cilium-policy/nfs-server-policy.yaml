@@ -1,0 +1,31 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-nfs
+  namespace: nfs-storage
+spec:
+  endpointSelector:
+    matchLabels:
+      app: nfs-server
+  ingress:
+  - toPorts:
+    - ports:
+      - port: "2049"
+        protocol: "TCP"
+      - port: "111"
+        protocol: "UDP"
+      rules:
+        http: 
+        - path: /
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        io.kubenetes.pod.namespace: "kube-system"
+        k8s-app: "kube-dns"
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: "UDP"
+      rules:
+        dns:
+        - matchPattern: "*"

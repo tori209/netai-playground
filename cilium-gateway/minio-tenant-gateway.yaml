@@ -1,0 +1,32 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: minio-tenant-gateway
+  namespace: minio-tenant
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: minio-tenant
+    allowedRoutes:
+      namespaces:
+        from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: minio-tenant-httproute
+  namespace: minio-tenant
+spec:
+  parentRefs:
+  - name: minio-tenant-gateway
+    namespace: minio-tenant
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: minio-tenant-console
+      port: 9090

@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cnp-http-l7-sample
+  namespace: playground
+spec:
+  description: "Allow egress traffic to outside"
+  endpointSelector:
+    matchLabels:
+      app: test-pod
+  egress:
+  - toFQDNs:
+    - matchPattern: "*.naver.com"
+    toPorts:
+    - ports:
+      - port: "80"
+        protocol: TCP
+      - port: "443"
+        protocol: TCP

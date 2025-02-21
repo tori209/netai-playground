@@ -1,0 +1,27 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: "file-write"
+spec:
+  kprobes:
+  - call: "vfs_write"
+    message: "File Write Event"
+    syscall: false
+    args:
+    - index: 0
+      type: "file" # (struct file *) used for getting the path
+    - index: 1
+      type: "char_buf"
+    - index: 2
+      type: "size_t"
+    selectors:
+    - matchBinaries:
+      - operator: "In"
+        values:
+        - "/usr/bin/kubelet"
+    - matchArgs:
+      - index: 0
+        operator: "Prefix"
+        values:
+        - "/var/lib/kubelet/pods"
+    tags: [ "observability.filesystem", "observability.process" ]

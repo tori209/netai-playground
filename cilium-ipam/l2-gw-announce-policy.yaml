@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: l2announce-for-monitoring
+spec:
+  serviceSelector:
+    matchExpressions:
+    - key: gateway.networking.k8s.io/gateway-name
+      operator: In
+      values:
+      - minio-tenant-gateway
+      - minio-operator-gateway
+      - grafana-gateway
+      - hubble-ui-gateway
+      - prometheus-gateway
+  interfaces:
+  - ^eno2$
+  loadBalancerIPs: true

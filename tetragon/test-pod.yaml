@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: play-pod
-        image: tori209/test-image:0.1
+        image: tori209/test-image:0.2
         # imagePullPolicy: Never
         resources: {}
         command: ["/bin/bash", "-c", "while true; do sleep 1000; done"]

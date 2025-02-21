@@ -2,8 +2,30 @@
 kubeProxyReplacement: true
 k8sServiceHost: "192.168.20.11"
 k8sServicePort: 6443
+#---------------------------------------------------------------------------------
 
-# Cilium As Ingress Controller Setting
+# Routing Mode Configure
+# REF: https://docs.cilium.io/en/stable/network/concepts/routing
+routingMode: "native"
+autoDirectNodeRoutes: true
+
+# This only handle pod's IP, not work with svc, etc...
+# Service'IP depends on kubernetes config(service-cluster-ip-range)
+ipam:
+  mode: "cluster-pool"
+  operator:
+    clusterPoolIPv4PodCIDRList: ["10.2.0.0/16"]
+    clusterPoolIPv4MaskSize: 24
+
+ipv4NativeRoutingCIDR: "10.2.0.0/16"
+enableIPv4Masquerade: true
+bpf:
+  masquerade: true
+
+#---------------------------------------------------------------------------------
+
+# Cilium As Ingress Controller Setting - Not working when using host network mode (v.1.16.6)
+#l7Proxy: true
 #ingressController:
 #  enabled: true
 #  default: true # Set Cilium as Default Ingress Controller
@@ -14,31 +36,27 @@ k8sServicePort: 6443
 #  
 #  # Create Controller Per Ingress
 #  loadbalancerMode: "dedicated"
-#  service:
-#    type: 
 #  # UNCOMMENT THIS WHEN "hostNetwork.enabled=true"
-#  #service:
-#  #  type: ClusterIP
-#  #  externalTrafficPolicy: null
-#
+#  service:
+#    type: ClusterIP
+#    externalTrafficPolicy: Null
 #  
 #  # If hostNetwork.enabled == true, Service Type NodePort/Loadbalancer will be disabled.
 #  hostNetwork:
 #    enabled: true
-#  l7Proxy: true
+#---------------------------------------------------------------------------------
 
 # Cilium Gateway API Setting
 gatewayAPI:
   enabled: true
-  hostNetwork:
-    enabled: true
+#  hostNetwork:
+#    enabled: true
 l7Proxy: true
 nodePort:
   enabled: true
-k8sServiceHost: "auto"
-k8sServicePort: "auto"
 endpointRoutes:
   enabled: true
+#--------------------------------------------------------------------------------------
 
 # Hubble Setting
 hubble:
@@ -75,11 +93,46 @@ hubble:
     - icmp
     # Enable additional labels for L7 flows
     - httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction
+#--------------------------------------------------------------------------------------
+
 # Prometheus
 prometheus:
   enabled: true
 operator:
   prometheus:
     enabled: true
+#--------------------------------------------------------------------------------------
 
+# Mutual Authentication (Beta Feature at v1.16)
+#authentication:
+#  mutual:
+#    spire:
+#      enabled: false
+#      install:
+#        enabled: true
+#--------------------------------------------------------------------------------------
 
+# Host Firewall
+hostFirewall:
+  enabled: true
+#--------------------------------------------------------------------------------------
+
+# L2 Announcements / L2 Aware LB (Beta Feature at v1.17)
+# Ensure that value below are declared:
+# kubeProxyReplacement = true
+# k8sServiceHost=${API_SERVER_IP}
+# k8sServicePort=${API_SERVER_PORT}
+
+l2announcements:
+  enabled: true
+k8sClientRateLimit:
+  qps: 30 # num(services) * (1 / leaseRenewDeadline)
+  burst: 50 # slightly higher to allow for bursts of traffic
+#--------------------------------------------------------------------------------------
+
+# Transparent Encryption
+#encryption:
+#  enabled: true
+#  type: "wireguard"
+
+ 

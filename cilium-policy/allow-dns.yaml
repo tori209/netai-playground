@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cnp-allow-dns
+  namespace: playground
+spec:
+  description: "Allow egress traffic to coredns"
+  endpointSelector:
+    matchLabels:
+      app: test-pod
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s-app: kube-dns
+        io.kubernetes.pod.namespace: kube-system
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+#      rules:
+#        dns:
+#          - matchPattern: "*"

@@ -1,0 +1,7 @@
+controller:
+  replicas: 2
+  runOnControlPlane: true
+  dnsPolicy: "ClusterFirstWithHostNet"
+
+node:
+  dnsPolicy: "ClusterFirstWithHostNet"
