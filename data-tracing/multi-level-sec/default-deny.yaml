@@ -1,0 +1,36 @@
+# REF: https://docs.cilium.io/en/stable/security/policy/intro/#endpoint-default-policy
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: intercept-all-dns
+spec:
+  describe: "Apply default-deny Rule to every endpoint, except DNS"
+  endpointSelector:
+    matchExpressions:
+      - key: "io.kubernetes.pod.namespace"
+        operator: "NotIn"
+        values:
+        - "kube-system"
+      - key: "k8s-app"
+        operator: "NotIn"
+        values:
+        - kube-dns
+  # Uncomment these when you doesnt want to block others.
+  # enableDefaultDeny:
+  #  egress: false
+  #  ingress: false
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+          - port: "53"
+            protocol: TCP
+          - port: "53"
+            protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+

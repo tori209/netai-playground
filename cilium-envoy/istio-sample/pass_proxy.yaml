@@ -1,0 +1,33 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: httpbin-proxy
+  namespace: playground
+spec:
+  endpointSelector:
+    matchLabels:
+      app: httpbin
+  ingress:
+  - fromEndpoints:
+      - {}
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+      - port: "8000"
+        protocol: TCP
+      rules:
+        http:
+        - path: "/"
+  egress:
+    - toEndpoints:
+      - matchLabels:
+          k8s-app: kube-dns
+          io.kubernetes.pod.namespace: kube-system
+      toPorts:
+      - ports:
+        - port: "53"
+          protocol: UDP
+        rules:
+          dns:
+            - matchPattern: "*"

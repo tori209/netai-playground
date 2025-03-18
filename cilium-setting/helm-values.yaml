@@ -25,10 +25,11 @@ bpf:
 #---------------------------------------------------------------------------------
 
 # Cilium As Ingress Controller Setting - Not working when using host network mode (v.1.16.6)
-#l7Proxy: true
-#ingressController:
-#  enabled: true
-#  default: true # Set Cilium as Default Ingress Controller
+l7Proxy: true
+ingressController:
+  enabled: true
+  default: true # Set Cilium as Default Ingress Controller
+  loadbalancerMode: "dedicated"
 #
 #  # Create Shared Controller
 #  #loadbalancerMode: "shared"
@@ -135,4 +136,4 @@ k8sClientRateLimit:
 #  enabled: true
 #  type: "wireguard"
 
- 
+#--------------------------------------------------------------------------------------

@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: echo-network-policy
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      app: echo
+  ingress:
+  - toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+      rules:
+        http:
+          - method: "GET"
+            path: "/"
+  

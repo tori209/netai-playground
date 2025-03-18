@@ -1,0 +1,43 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: "lev-s-default-policy"
+  namespace: "level-s"
+spec:
+  description: "Network Control for S-Class"
+  endpointSelector: {}
+  ingress:
+  # Allow Ingress Traffic from same ns
+  - fromEndpoints: 
+    - {}
+  egress:
+  # Allow K8s DNS
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: "kube-system"
+        k8s-app: "kube-dns"
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: "ANY"
+      rules:
+        dns:
+        - matchPattern: "*" # For L7 DNS Intercept
+  # Allow Egress Traffic to same ns
+  - toEndpoints:
+    - {}
+  # TEST: Allow apt-get repo
+  - toPorts:
+    - ports:
+      - port: "80"
+        protocol: TCP
+      - port: "443"
+        protocol: TCP
+      - port: "8080"
+        protocol: TCP
+      rules:
+        http:
+        - method: ""
+          host: "deb\\.debian\\.org"
+        - method: ""
+          host: "security\\.debian\\.org"

@@ -1,0 +1,67 @@
+import grpc
+from concurrent import futures
+import logging
+
+import time
+
+# Envoy에서 제공하는 Protobuf Import
+import auth_pb2
+import auth_pb2_grpc
+
+from google.protobuf import struct_pb2
+
+class AuthorizationServicer(auth_pb2_grpc.AuthorizationServicer):
+    def Check(self, request, context):
+        """
+        Envoy의 ext_authz 필터에서 보낸 요청을 처리하는 메서드
+        """
+        print("\n=== New Authorization Request ===")
+
+        # request.attributes에 값이 있는지 확인
+        if request.HasField("attributes"):
+            attributes = request.attributes
+            
+            # HTTP 요청 정보 가져오기
+            if attributes.HasField("request"):
+                http_req = attributes.request.http
+                print(f"HTTP Method: {http_req.method}")
+                print(f"Path: {http_req.path}")
+                print(f"Headers: {dict(http_req.headers)}")
+
+            # 요청을 보낸 클라이언트 정보 가져오기
+            if attributes.HasField("source"):
+                source = attributes.source
+                if source.HasField("address") and source.address.HasField("socket_address"):
+                    print(f"Source IP: {source.address.socket_address.address}")
+                    print(f"Source Port: {source.address.socket_address.port_value}")
+
+            # Envoy Context Extensions 가져오기
+            if attributes.context_extensions:
+                print("Context Extensions:")
+                for key, value in attributes.context_extensions.items():
+                    print(f"  {key}: {value}")
+
+        # 모든 요청을 허용하는 응답 반환
+        response = auth_pb2.CheckResponse(
+            status=auth_pb2.CheckResponse.OK
+        )
+        return response
+
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    auth_pb2_grpc.add_AuthorizationServicer_to_server(AuthorizationServicer(), server)
+    server.add_insecure_port("[::]:50051")
+    print("gRPC Auth Server is running on port 50051...")
+    server.start()
+
+    try:
+        while True:
+            time.sleep(86400)  # 서버를 지속적으로 실행 (하루 단위)
+    except KeyboardInterrupt:
+        server.stop(0)
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    serve()
+

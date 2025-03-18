@@ -1,0 +1,46 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ext-pass
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      app: ext-authz
+  ingress:
+  - fromEndpoints:
+      - {}
+    toPorts:
+    - ports:
+      - port: "8000"
+        protocol: TCP
+      - port: "9000"
+        protocol: TCP
+      rules:
+        http:
+        - path: "/"
+  - fromEntities:
+      - host
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+      - port: "9000"
+        protocol: TCP
+      - port: "8000"
+        protocol: TCP
+      rules:
+        http:
+        - path: "/"
+  egress:
+    - toEndpoints:
+      - matchLabels:
+          k8s-app: kube-dns
+          io.kubernetes.pod.namespace: kube-system
+      toPorts:
+      - ports:
+        - port: "53"
+          protocol: UDP
+        rules:
+          dns:
+            - matchPattern: "*"

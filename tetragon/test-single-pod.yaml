@@ -8,11 +8,17 @@ metadata:
     purpose: playground
 spec:
   containers:
-  - name: play-pod
-    image: nginx:1.15.9
+  - name: busybox-container
+    image: busybox:latest
     # imagePullPolicy: Never
-    resources: {}
-    command: ["/bin/bash", "-c", "while true; do sleep 1000; done"]
+    resources:
+      requests:
+        cpu: 30m
+        memory: 64Mi
+      limits:
+        cpu: 30m
+        memory: 128Mi
+    command: ["/bin/sh", "-c", "--", "while true; do sleep 1000; done"]
     ports:
     - containerPort: 80
   nodeName: s6

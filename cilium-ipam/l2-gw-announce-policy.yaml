@@ -14,5 +14,5 @@ spec:
       - hubble-ui-gateway
       - prometheus-gateway
   interfaces:
-  - ^eno2$
+  - ^eno4$
   loadBalancerIPs: true

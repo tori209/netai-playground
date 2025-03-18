@@ -1,15 +1,15 @@
 apiVersion: cilium.io/v1alpha1
 kind: TracingPolicy
 metadata:
-  name: "file-write"
+  name: "volume-init"
 spec:
   kprobes:
-  - call: "nfs4_file_open"
-    message: "File Write Event"
+  - call: "nfs4_submount"
+    message: "init nfs volume"
     syscall: false
-    args:
-    - index: 1
-      type: "file" # (struct file *) used to get file path
+#    args:
+#    - index: 1
+#      type: "file" # (struct file *) used to get file path
 #    selectors:
 #    - matchBinaries:
 #      - operator: "In"

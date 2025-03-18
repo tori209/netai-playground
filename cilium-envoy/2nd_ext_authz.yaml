@@ -1,0 +1,90 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideEnvoyConfig
+metadata:
+  name: ext-authz-test
+spec:
+  services:
+    - name: echo-service-1
+      namespace: default
+      ports:
+      - 8080
+  resources:
+    - "@type": type.googleapis.com/envoy.config.listener.v3.Listener
+      name: test-authz
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8080
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: test-authz
+                route_config:
+                  name: test_route
+                  virtual_hosts:
+                    - name: '*'
+                      domains: ["*"]
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: "echo1"
+                http_filters:
+                  - name: envoy.filters.http.ext_authz
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+                      transport_api_version: V3
+                      http_service:
+                        server_uri:
+                          uri: "http://ext-authz.default.svc.cluster.local:30921"
+                          cluster: "ext-authz"
+                          timeout: 15s
+                        authorization_request:
+                          allowed_headers:
+                            patterns:
+                              - exact: "x-ext-authz"
+                              - exact: "authorization"
+                              - exact: "path"
+                              - prefix: "x-auth-request-"
+                              - prefix: "x-forwarded-"
+                        authorization_response:
+                          allowed_upstream_headers:
+                            patterns:
+                              - prefix: "x-auth-"
+                                ignore_case: true
+                      failure_mode_allow: false
+                      include_peer_certificate: true
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+    - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+      name: "echo1"
+      connect_timeout: 5s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: "echo1"
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: echo-service-1.default.svc.cluster.local
+                      port_value: 8080
+    - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+      name: "ext-authz"
+      connect_timeout: 5s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: "ext-authz"
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: ext-authz.default.svc.cluster.local
+                      port_value: 30921
+

@@ -1,0 +1,29 @@
+import grpc
+from concurrent import futures
+
+# Importing generated classes
+import auth_pb2
+import auth_pb2_grpc
+
+
+class AuthorizationServicer(auth_pb2_grpc.AuthorizationServicer):
+    def Check(self, request, context):
+        print("Received request:", request)
+        response = auth_pb2.CheckResponse(status=auth_pb2.CheckResponse.OK)
+
+        print(response)
+        return response
+
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    auth_pb2_grpc.add_AuthorizationServicer_to_server(AuthorizationServicer(), server)
+    server.add_insecure_port("[::]:50051")
+    print("Starting gRPC server on port 50051...")
+    server.start()
+    server.wait_for_termination()
+
+
+if __name__ == "__main__":
+    serve()
+

@@ -1,0 +1,126 @@
+apiVersion: cilium.io/v2
+kind: CiliumEnvoyConfig
+metadata:
+  name: ext-authz-test
+spec:
+#  backendServices:
+#  - name: 
+#    namespace:
+#    number: # Port
+  services:
+    - name: echo-service-1
+      namespace: default
+      ports:
+      - 8080
+  backendServices:
+    - name: echo-service-1
+      namespace: default
+      number:
+      - 8080
+#    - name: echo-service-2
+#      namespace: default
+#      ports:
+#      - 8080
+  resources:
+    - "@type": type.googleapis.com/envoy.config.listener.v3.Listener
+      name: test-authz
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8080
+      filter_chains:
+        - filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+              stat_prefix: test-authz
+              routeConfig:
+                name: test_route
+                virtualHosts:
+                  - name: '*'
+                    domains: ["*"]
+                    routes:
+                      - match:
+                          prefix: "/"
+                        route:
+                          cluster: "echo1"
+              httpFilters:
+                - name: envoy.filters.http.ext_authz
+                  typedConfig:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+                    transport_api_version: V3
+                    http_service: 
+                      server_uri:
+                        uri: "ext-authz.default.svc.cluster.local:8000"
+                        cluster: "ext-authz"
+                        timeout: 15s
+                      authorization_request:
+                        allowed_headers:
+                          patterns:
+                          - exact: "x-ext-authz"
+                          - exact: "authorization"
+                          - exact: "path"
+                          - prefix: "x-auth-request-"
+                          - prefix: "x-forwarded-"
+                      authorization_response:
+                        allowed_upstream_headers:
+                          patterns:
+                          - prefix: "x-auth-"
+                            ignore_case: true
+                    failureModeAllow: false
+                    includePeerCertificate: true
+                - name: envoy.filters.http.router
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+    - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+      name: "echo1"
+      connectTimeout: 5s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: "echo1"
+        endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: echo-service-1.default.svc.cluster.local
+                    port_value: 8080
+#      outlier_detection:
+#        split_external_local_origin_errors: true
+#        consecutive_local_origin_failure: 2
+    - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+      name: "ext-authz"
+      connectTimeout: 5s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: "ext-authz"
+        endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: ext-authz.default.svc.cluster.local
+                    port_value: 8000
+#      outlier_detection:
+#        split_external_local_origin_errors: true
+#        consecutive_local_origin_failure: 2
+  #    - "@type": type.googleapis.com/envoy.config.cluster.v3.Cluster
+  #      name: "playground/ext-authz"
+  #      connectTimeout: 1s
+  #      type: LOGICAL_DNS
+  #      lbPolicy: ROUND_ROBIN
+  #      outlier_detection:
+  #        split_external_local_origin_errors: true
+  #        consecutive_local_origin_failure: 2
+  #      load_assignment:
+  #        cluster_name: "playground/ext-authz"
+  #        endpoints:
+  #        - lb_endpoints:
+  #          - endpoint:
+  #              address:
+  #                socket_address:
+  #                  address: "ext-authz.playground.svc.cluster.local"
+  #                  port_value: "8000"
+      
