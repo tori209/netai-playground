@@ -67,14 +67,14 @@ hubble:
   ui:
     enabled: true
   # REF: https://docs.cilium.io/en/latest/observability/hubble/configuration/export/
-  #  export:
-  #    static:
-  #      enabled: true # Set true to enable static log exporter
-  #      filePath: "/var/run/cilium/hubble/events.log"
-  #    dynamic:
-  #      enabled: false # For Safety
-  #    fileMaxSizeMb: 10 # Default = 10
-  #    fileMaxBackups: 5 # Default = 5
+  export:
+    static:
+      enabled: true # Set true to enable static log exporter
+      filePath: "/var/run/cilium/hubble/events.log"
+    dynamic:
+      enabled: true 
+    fileMaxSizeMb: 10 # Default = 10
+    fileMaxBackups: 5 # Default = 5
   # https://docs.cilium.io/en/stable/observability/grafana/
   metrics:
     enableOpenMetrics: true

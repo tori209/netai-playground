@@ -8,8 +8,9 @@ spec:
     - key: gateway.networking.k8s.io/gateway-name
       operator: In
       values:
-      - minio-tenant-gateway
-      - minio-operator-gateway
+      - minio-c-gateway
+      - minio-s-gateway
+      - minio-o-gateway
       - grafana-gateway
       - hubble-ui-gateway
       - prometheus-gateway

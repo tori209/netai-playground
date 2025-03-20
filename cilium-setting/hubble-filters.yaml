@@ -1,0 +1,17 @@
+# Use this only when 
+hubble:
+  export:
+    dynamic:
+      enabled: true
+      config:
+        enabled: true
+        content:
+        - name: "without-kube-system"
+          filePath: "/var/run/cilium/hubble/without-kube-system.log"
+          fieldMask: []
+          includeFilters: []
+          excludeFilters:
+          - source_pod:
+            - "kube-system/"
+          - destination_pod:
+            - "kube-system/"

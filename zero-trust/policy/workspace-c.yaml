@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: intercept-http
+  namespace: workspace-c
+spec:
+  endpointSelector:
+    matchLabels:
+      app: python
+  egress:
+  - toEntities:
+    - "all"
+    toPorts:
+    - ports:
+      - port: "80"
+        protocol: "TCP" 
+      - port: "9000"
+        protocol: "TCP"
+      rules:
+        http:
+        - method: "GET"
+  enableDefaultDeny:
+    egress: false
+    ingress: false

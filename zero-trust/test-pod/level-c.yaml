@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: level-c-python
+  namespace: workspace-c
+spec:
+  selector:
+    matchLabels: &pod_labels
+      purpose: zt-classified
+      minio-s-exceptional-access: deny
+  template:
+    metadata:
+      name: level-c-python
+      labels:
+        <<: *pod_labels
+        app: python
+    spec:
+      containers:
+      - name: python
+        image: python
+          #        resources:
+          #          requests:
+          #            cpu: 30m
+          #            memory: 64Mi
+          #          limits:
+          #            cpu: 30m
+          #            memory: 128Mi
+        command: ["/bin/sh", "-c", "--", "while true; do sleep 1000; done"] 
+        envFrom:
+        - secretRef:
+            name: env
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: level-c-python-exceptional
+  namespace: workspace-c
+spec:
+  selector:
+    matchLabels: &pod_labels_exceptional
+      purpose: zt-classified
+      minio-s-exceptional-access: allow
+  template:
+    metadata:
+      name: level-c-python-exceptional
+      labels:
+        <<: *pod_labels_exceptional
+        app: python
+    spec:
+      containers:
+      - name: python
+        image: python
+          #        resources:
+          #          requests:
+          #            cpu: 30m
+          #            memory: 64Mi
+          #          limits:
+          #            cpu: 30m
+          #            memory: 128Mi
+        command: ["/bin/sh", "-c", "--", "while true; do sleep 1000; done"] 
+        envFrom:
+        - secretRef:
+            name: env

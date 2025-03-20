@@ -1,0 +1,61 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: minio-s-guard.yaml
+  namespace: minio-s
+spec:
+  description: "Network Policy for level-c minio storage."
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: minio-operator
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace.labels.level: kube-system
+  - fromEntities: # For GUI Access
+    - ingress
+    toPorts:
+    - ports:
+      - port: "9090"
+        protocol: "TCP"
+      rules: &HTTP_ALL_METHODS
+        http: 
+        - method: "GET"
+        - method: "POST"
+        - method: "PUT"
+        - method: "DELETE"
+        - method: "HEAD"
+  - fromEntities: # For Host Access, Only health check
+    - host
+    toPorts:
+    - ports:
+      - port: "4444"
+        protocol: "TCP"
+  - fromEndpoints: # Allow Traffic from namespace with level-s
+    - matchLabels:
+        io.cilium.k8s.namespace.labels.security-level: "sensitive"
+  - fromEndpoints: # Exceptionally Allow Traffic from namespace with level-c, for all http request
+    - matchLabels:
+        io.cilium.k8s.namespace.labels.security-level: "classified"
+        minio-s-exceptional-access: allow
+    toPorts:
+    - ports: 
+      - port: "9000"
+        protocol: "TCP"
+      rules:
+        <<: *HTTP_ALL_METHODS
+  - fromEndpoints: # Allow Traffic from namespace with level-c, only GET Request
+    - matchLabels:
+        io.cilium.k8s.namespace.labels.security-level: "classified"
+    toPorts:
+    - ports:
+      - port: "9000"
+        protocol: "TCP"
+      rules:
+        http:
+        - method: "GET"
+        - method: "HEAD"
+    
+
+

@@ -1,0 +1,1 @@
+kubectl cp ./file_uploader_to_o.py workspace-c/level-c-python-ff485887c-b54mm:/

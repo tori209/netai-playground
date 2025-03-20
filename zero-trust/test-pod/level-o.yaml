@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: level-o-python
+  namespace: workspace-o
+spec:
+  selector:
+    matchLabels: &pod_labels
+      purpose: zt-open
+  template:
+    metadata:
+      name: level-o-python
+      labels:
+        <<: *pod_labels
+        app: python
+    spec:
+      containers:
+      - name: python
+        image: python
+        command: ["/bin/sh", "-c", "--", "while true; do sleep 1000; done"] 
+        envFrom:
+        - secretRef:
+            name: env

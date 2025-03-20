@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: level-s-python
+  namespace: workspace-s
+spec:
+  selector:
+    matchLabels: &pod_labels
+      purpose: zt-sensitive
+      minio-o-exceptional-access: deny
+  template:
+    metadata:
+      name: level-s-python
+      labels:
+        <<: *pod_labels
+        app: python
+    spec:
+      containers:
+      - name: python
+        image: python
+        command: ["/bin/sh", "-c", "--", "while true; do sleep 1000; done"] 
+        envFrom:
+        - secretRef:
+            name: env
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: level-s-python-exceptional
+  namespace: workspace-s
+spec:
+  selector:
+    matchLabels: &pod_labels_exceptional
+      purpose: zt-sensitive
+      minio-o-exceptional-access: allow
+  template:
+    metadata:
+      name: level-s-python-exceptional
+      labels:
+        <<: *pod_labels_exceptional
+        app: python
+    spec:
+      containers:
+      - name: python
+        image: python
+        command: ["/bin/sh", "-c", "--", "while true; do sleep 1000; done"] 
+        envFrom:
+        - secretRef:
+            name: env

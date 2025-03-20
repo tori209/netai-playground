@@ -1,0 +1,42 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: minio-c-guard.yaml
+  namespace: minio-c
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints: # Allow Traffic from level-c namespace
+    - matchLabels:
+        io.cilium.k8s.namespace.labels.security-level: classified
+    toPorts:
+    - ports:
+      - port: "9000"
+        protocol: "TCP"
+      rules:
+        http:
+        - method: "GET"
+        - method: "PUT"
+        - method: "POST"
+        - method: "DELETE"
+        - method: "HEAD"
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: minio-operator
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace.labels.level: kube-system
+  - fromEntities: # For GUI Access
+    - ingress
+    toPorts:
+    - ports:
+      - port: "9090"
+        protocol: "TCP"
+      rules:
+        http: []
+  - fromEntities: # For Host Access
+    - host
+    toPorts:
+    - ports:
+      - port: "4444"
+        protocol: "TCP"
