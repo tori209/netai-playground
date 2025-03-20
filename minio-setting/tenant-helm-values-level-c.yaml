@@ -91,7 +91,7 @@ tenant:
   configSecret:
     name: minio-level-c-env-config
     accessKey: minio
-    secretKey: netAi007!
+    secretKey: 1234
     #existingSecret: true
 
   ###
