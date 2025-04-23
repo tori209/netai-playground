@@ -19,13 +19,8 @@ spec:
     - ports:
       - port: "9090"
         protocol: "TCP"
-      rules: &HTTP_ALL_METHODS
-        http: 
-        - method: "GET"
-        - method: "POST"
-        - method: "PUT"
-        - method: "DELETE"
-        - method: "HEAD"
+      rules: 
+        http: []
   - fromEntities: # For Host Access, Only health check
     - host
     toPorts:
@@ -44,7 +39,12 @@ spec:
       - port: "9000"
         protocol: "TCP"
       rules:
-        <<: *HTTP_ALL_METHODS
+        http:
+        - method: "GET"
+        - method: "POST"
+        - method: "PUT"
+        - method: "DELETE"
+        - method: "HEAD"
   - fromEndpoints: # Allow Traffic from namespace with level-c, only GET Request
     - matchLabels:
         io.cilium.k8s.namespace.labels.security-level: "classified"
