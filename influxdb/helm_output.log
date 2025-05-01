@@ -1,23 +1,16 @@
-Release "influxdb" does not exist. Installing it now.
 NAME: influxdb
-LAST DEPLOYED: Thu May  1 06:11:18 2025
+LAST DEPLOYED: Thu May  1 08:02:51 2025
 NAMESPACE: influxdb
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
 NOTES:
-InfluxDB can be accessed via port 8086 on the following DNS name from within your cluster:
+InfluxDB 2 is deployed as a StatefulSet on your cluster.
 
-  http://influxdb.influxdb:8086
+You can access it by using the service name: influxdb-influxdb2
 
-You can connect to the remote instance with the influx CLI. To forward the API port to localhost:8086, run the following:
+To retrieve the password for the 'admin' user:
 
-  kubectl port-forward --namespace influxdb $(kubectl get pods --namespace influxdb -l app=influxdb -o jsonpath='{ .items[0].metadata.name }') 8086:8086
+  echo $(kubectl get secret influxdb-influxdb2-auth -o "jsonpath={.data['admin-password']}" --namespace influxdb | base64 --decode)
 
-You can also connect to the influx CLI from inside the container. To open a shell session in the InfluxDB pod, run the following:
-
-  kubectl exec -i -t --namespace influxdb $(kubectl get pods --namespace influxdb -l app=influxdb -o jsonpath='{.items[0].metadata.name}') /bin/sh
-
-To view the logs for the InfluxDB pod, run the following:
-
-  kubectl logs -f --namespace influxdb $(kubectl get pods --namespace influxdb -l app=influxdb -o jsonpath='{ .items[0].metadata.name }')
+Note: with enabled persistence, admin password is only set once during the initial deployment. The password is not changed when InfluxDB 2 is re-deployed with different password.

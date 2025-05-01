@@ -9,6 +9,7 @@ spec:
       operator: In
       values:
       - influxdb-gateway
+      - chronograf-gateway
       - minio-c-gateway
       - minio-s-gateway
       - minio-o-gateway
