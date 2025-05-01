@@ -105,12 +105,13 @@ operator:
 #--------------------------------------------------------------------------------------
 
 # Mutual Authentication (Beta Feature at v1.16)
-#authentication:
-#  mutual:
-#    spire:
-#      enabled: false
-#      install:
-#        enabled: true
+# You should add "authentication: \n mode: required" to your CiliumNetworkPolicy.
+authentication:
+  mutual:
+    spire:
+      enabled: true
+      install:
+        enabled: true
 #--------------------------------------------------------------------------------------
 
 # Host Firewall
@@ -132,8 +133,9 @@ k8sClientRateLimit:
 #--------------------------------------------------------------------------------------
 
 # Transparent Encryption
-#encryption:
-#  enabled: true
-#  type: "wireguard"
+encryption:
+  enabled: true
+  type: wireguard
+
 
 #--------------------------------------------------------------------------------------
