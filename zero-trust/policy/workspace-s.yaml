@@ -1,0 +1,96 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: workspace-s
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: "io.kubernetes.pod.namespace"
+        operator: "NotIn"
+        values:
+        - "kube-system"
+      - key: "k8s-app"
+        operator: "NotIn"
+        values:
+        - kube-dns
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: TCP
+      - port: "53"
+        protocol: UDP
+      rules:
+        dns:
+        - matchPattern: "*"
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: common-policy
+  namespace: workspace-s
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        "io.cilium.k8s.namespace.labels.security-level": sensitive
+    authentication:
+      mode: required
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        "io.cilium.k8s.namespace.labels.security-level": sensitive
+    authentication:
+      mode: required
+#---
+#apiVersion: cilium.io/v2
+#kind: CiliumNetworkPolicy
+#metadata:
+#  name: driver-policy
+#  namespace: workspace-s
+#spec:
+#  endpointSelector:
+#    matchLabels:
+#      app: driver
+#  ingress:
+#  - fromEndpoints:
+#    - matchLabels:
+#        app: executor
+#    authentication:
+#      mode: required
+#  egress:
+#  - toEndpoints:
+#    - matchLabels:
+#        app: executor
+#    authentication:
+#      mode: required
+#---
+#apiVersion: cilium.io/v2
+#kind: CiliumNetworkPolicy
+#metadata:
+#  name: executor-policy
+#  namespace: workspace-s
+#spec:
+#  endpointSelector:
+#    matchLabels:
+#      app: executor
+#  ingress:
+#  - fromEndpoints:
+#    - matchLabels:
+#        app: driver
+#    authentication:
+#      mode: required
+#  egress:
+#  - toEndpoints:
+#    - matchLabels:
+#        app: driver
+#    authentication:
+#      mode: required
+ 
+

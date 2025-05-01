@@ -1,0 +1,43 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: prevent-shell-execution
+  namespace: workspace-s
+spec:
+  # podSelector:
+  #   matchLabels:
+  #   matchExpressions:
+  kprobes:
+  - call: "sys_execve"
+    syscall: true
+    args:
+    - index: 0
+      type: string
+    selectors:
+    - matchArgs:
+      - index: 0
+        operator: "Equal"
+        values:
+        - "/bin/sh"
+        - "/bin/bash"
+        - "/usr/bin/sh"
+        - "/usr/bin/bash"
+      matchActions:
+      - action: Sigkill
+  - call: "sys_execveat"
+    syscall: true
+    args:
+    - index: 1
+      type: string
+    selectors:
+    - matchArgs:
+      - index: 1
+        operator: "Equal"
+        values:
+        - "/bin/sh"
+        - "/bin/bash"
+        - "/usr/bin/sh"
+        - "/usr/bin/bash"
+      matchActions:
+      - action: Sigkill
+
