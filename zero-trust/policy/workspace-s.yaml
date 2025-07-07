@@ -48,6 +48,18 @@ spec:
         "io.cilium.k8s.namespace.labels.security-level": sensitive
     authentication:
       mode: required
+  - toEndpoints:
+    - matchLabels:
+        "io.cilium.k8s.namespace.labels.security-level": open
+    authentication:
+      mode: required
+  - toEndpoints:
+    - matchLabels:
+        "io.kubernetes.pod.namespace": postgresql
+  - toCIDRSet:
+    - cidr: 15.164.214.0/24
+    - cidr: 54.180.0.0/15
+    
 #---
 #apiVersion: cilium.io/v2
 #kind: CiliumNetworkPolicy
